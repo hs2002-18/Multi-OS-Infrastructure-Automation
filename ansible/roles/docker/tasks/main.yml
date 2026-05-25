@@ -1,0 +1,40 @@
+- name: Install Docker on Debian-based systems
+  apt:
+    name:
+      - docker.io
+      - python3-pip
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Install Docker on Amazon Linux
+  yum:
+    name:
+      - docker
+      - python3-pip
+    state: present
+  when: ansible_facts['distribution'] == "Amazon"
+
+- name: Start Docker Service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Install Docker SDK on Ubuntu/Debian
+  pip:
+    name: docker
+    extra_args: --break-system-packages
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Install Docker SDK on Amazon Linux
+  pip:
+    name: docker
+    extra_args: --ignore-installed
+  when: ansible_facts['distribution'] == "Amazon"
+
+- name: Remove existing nginx container if any
+  shell: docker rm -f nginx_container || true
+
+- name: Run NGINX container
+  command: docker run -d --name nginx_container -p 80:80 nginx

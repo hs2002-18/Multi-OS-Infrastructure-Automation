@@ -1,0 +1,7 @@
+- name: Configure Worker Nodes
+  hosts: all
+  become: yes
+
+  roles:
+    - common
+    - docker
